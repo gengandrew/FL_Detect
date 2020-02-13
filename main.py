@@ -9,18 +9,18 @@ import dlib
 import cv2
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-p", "--shape-predictor", required=True)
+ap.add_argument("-p", "--predictor", required=True)
 args = vars(ap.parse_args())
 
 print("Got here 1")
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor(args["shape_predictor"])
+predictor = dlib.shape_predictor(args["predictor"])
 
 print("Got here 2")
 vs = VideoStream(0).start()
 time.sleep(2.0)
-print("Got here 3")
 
+print("Got here 3")
 while True:
     frame = vs.read()
     frame = imutils.resize(frame, width=800)
