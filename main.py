@@ -15,11 +15,9 @@ detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("68_landmarks.dat")
 
 def getInitialCal():
-    print("Got here 1")
     vs = VideoStream(0).start()
     time.sleep(2.0)
 
-    print("Got here 2")
     while True:
         frame = vs.read()
         frame = imutils.resize(frame, width=800)
@@ -32,19 +30,11 @@ def getInitialCal():
             shape = face_utils.shape_to_np(shape)
             xlist = []
             ylist = []
-            index = 1
             for (x, y) in shape:
-                if index == 49 or index == 55:
-                    cv2.circle(frame, (x, y), 1, (255, 0, 255), thickness=1)
-                    print("At index "+str(index)+" value of ["+str(x)+","+str(y)+"]")
-                else:
-                    cv2.circle(frame, (x, y), 1, (0, 0, 255), thickness=1)
-            
+                cv2.circle(frame, (x, y), 1, (0, 0, 255), thickness=1)
                 xlist.append(float(x))
                 ylist.append(float(y))
-                index = index+1
 
-            # Start frame streaming
             cv2.line(frame, (int(xlist[2]), int(ylist[2])), (int(xlist[14]), int(ylist[14])), (255, 0, 255), thickness=2)
             cv2.line(frame, (int(xlist[8]), int(ylist[8])), (int(xlist[27]), int(ylist[27])), (255, 0, 255), thickness=2)
             cv2.imshow("Frame", frame)
@@ -59,14 +49,10 @@ def getInitialCal():
                 return ret
 
 
-
 initCal = getInitialCal()
-
-print("Got here 1")
 vs = VideoStream(0).start()
 time.sleep(2.0)
 
-print("Got here 2")
 while True:
     shouldExit = False
     frame = vs.read()
@@ -85,12 +71,7 @@ while True:
         ylist = []
         index = 1
         for (x, y) in shape:
-            if index == 49 or index == 55:
-                cv2.circle(frame, (x, y), 1, (255, 0, 255), thickness=1)
-                print("At index "+str(index)+" value of ["+str(x)+","+str(y)+"]")
-            else:
-                cv2.circle(frame, (x, y), 1, (0, 0, 255), thickness=1)
-            
+            cv2.circle(frame, (x, y), 1, (0, 0, 255), thickness=2)
             xlist.append(float(x))
             ylist.append(float(y))
             index = index+1
