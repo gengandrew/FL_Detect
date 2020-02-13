@@ -3,18 +3,48 @@ from imutils.video import WebcamVideoStream
 from imutils import face_utils
 from scipy.spatial import distance
 from datetime import datetime
+from numpy import ones,vstack
+from numpy.linalg import lstsq
+import numpy as np
 import datetime
 import argparse
 import imutils
 import time
 import dlib
 import cv2
-import numpy as np
 import math
 
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("68_landmarks.dat")
 deviation = 40
+
+def solveLinearEq(p1, p2):
+    points = [p1, p2]
+    xCoords, yCoords = zip(*points)
+    matrixA = vstack([xCoords,ones(len(xCoords))]).T
+    m, c = lstsq(matrixA, yCoords)[0]
+    # print("Line Solution is y = {m}x + {c}".format(m=m,c=c))
+    return m, c
+
+
+def line(p1, p2):
+    A = (p1[1] - p2[1])
+    B = (p2[0] - p1[0])
+    C = (p1[0]*p2[1] - p2[0]*p1[1])
+    return A, B, -C
+
+
+def intersection(L1, L2):
+    D  = L1[0] * L2[1] - L1[1] * L2[0]
+    Dx = L1[2] * L2[1] - L1[1] * L2[2]
+    Dy = L1[0] * L2[2] - L1[2] * L2[0]
+    if D != 0:
+        x = Dx / D
+        y = Dy / D
+        return x,y
+    else:
+        return False
+
 
 def getInitialCal():
     vs = VideoStream(0).start()
@@ -75,17 +105,26 @@ def dataCollection(calibration):
             xylist = []
             for (x, y) in shape:
                 cv2.circle(frame, (x, y), 1, (0, 0, 255), thickness=2)
-                xylist.append((float(x), float(y), currTime))
+                xylist.append((float(x), float(y)))
 
             nhline = distance.euclidean((xylist[2][0], xylist[2][1]), (xylist[14][0], xylist[14][1]))
             nvline = distance.euclidean((xylist[8][0], xylist[8][1]), (xylist[27][0], xylist[27][1]))
             if abs(float(calibration["hline"]) - float(nhline)) < deviation and abs(float(calibration["vline"]) - float(nvline)) < deviation:
-                data.append(xylist)
+                m, c = solveLinearEq((xylist[2][0],xylist[2][1]),(xylist[14][0],xylist[14][1]))
+                m, c = solveLinearEq((xylist[8][0],xylist[8][1]),(xylist[27][0],xylist[27][1]))
+                L1 = line((xylist[2][0],xylist[2][1]),(xylist[14][0],xylist[14][1]))
+                L2 = line((xylist[8][0],xylist[8][1]),(xylist[27][0],xylist[27][1]))
+                R = intersection(L1, L2)
+                distList = []
+                for (x, y) in xylist:
+                    distList.append((distance.euclidean((x,y),R), currTime))
+                
+                data.append(distList)
             else:
                 print("Failed deviation check")
             
             if cv2.waitKey(1) & 0xFF == ord("q"):
-                print(data)
+                print(data[1])
                 cv2.destroyAllWindows()
                 vs.stop()
                 print("Cleanup complete")
