@@ -4,4 +4,5 @@ A simple python application for detection and calculating numerical values for f
 
 ### Scripts
 
-sudo Python main.py --predictor 68_landmarks.dat
+sudo Python main.py
+Python main.py
