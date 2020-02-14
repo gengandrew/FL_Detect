@@ -2,6 +2,7 @@ from imutils.video import VideoStream
 from scipy.spatial import distance
 from imutils import face_utils
 from datetime import datetime
+import matplotlib.pyplot as plt
 import numpy as np
 import imutils
 import time
@@ -110,8 +111,10 @@ def dataCollection(calibration):
                 index = 0
                 for (x, y) in xylist:
                     # TODO: Potentially parse out all the not needed points
-                    distList.append(distance.euclidean((x,y),R)/normalize[index])
-                    print("Unnormalize is " + str(distance.euclidean((x,y),R)) + " normalize is " + str(normalize[index]) + " resulting value is " + str(distance.euclidean((x,y),R)/normalize[index]))
+                    distList.append(distance.euclidean((x,y),R) - normalize[index])
+                    print("Unnormalize is " + str(distance.euclidean((x,y),R)) + " normalize is " 
+                            + str(normalize[index]) + " resulting value is " 
+                            + str(distance.euclidean((x,y),R) - normalize[index]))
                     index = index + 1
                 
                 data.append((distList, currTime))
@@ -127,4 +130,17 @@ def dataCollection(calibration):
 
 initCal = getInitialCal()
 data = dataCollection(initCal)
+fig = plt.figure()
+ax = fig.add_subplot(1, 1, 1, axisbg="1.0")
+for each in data:
+    distList = each[0]
+    index = 0
+    for distance in distList:
+        ax.scatter(distance, index, alpha=0.8, c="red", edgecolors='none', s=30)
+        index = index+1
+
+plt.title('Matplot scatter plot')
+plt.legend(loc=2)
+plt.show()
+
 print(data)
