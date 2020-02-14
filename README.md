@@ -26,4 +26,5 @@ Python main.py
 ## Program Workflow
 
 - An initial baseline image needs to be taken for normalization, center your face and press "o" when ready
-- After a 2 second delay faicial landmarks will be streamed to the "data" datastructure
+- After a 2 second delay faicial landmarks will be streamed into the "data" datastructure
+- Press "q" to end landmark streaming and close application
