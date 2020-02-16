@@ -102,9 +102,6 @@ def dataCollection(calibration):
         shouldExit = False
         frame = vs.read()
         frame = imutils.resize(frame, width=800)
-        # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        # rects = detector(gray, 0)
-        # print("rects1 = " + str(len(rects)))
         rects = detector(frame, 0)
         currTime = datetime.utcnow().strftime("%Y%m%dT%H%M%S.%fZ")
         if len(rects) == 0:
