@@ -12,7 +12,24 @@ import cv2
 
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("68_landmarks.dat")
-deviation = 40
+face_size_deviation = 40
+face_landmark_deviation = 55
+
+
+def graph(data):
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1, axisbg="1.0")
+    for each in data:
+        distList = each[0]
+        index = 0
+        for distance in distList:
+            ax.scatter(distance, index, alpha=0.8, c="red", edgecolors='none', s=30)
+            index = index+1
+
+    plt.title('Matplot scatter plot')
+    plt.legend(loc=2)
+    plt.show()
+
 
 def line(p1, p2):
     A = (p1[1] - p2[1])
@@ -103,15 +120,16 @@ def dataCollection(calibration):
 
             nhline = distance.euclidean((xylist[2][0], xylist[2][1]), (xylist[14][0], xylist[14][1]))
             nvline = distance.euclidean((xylist[8][0], xylist[8][1]), (xylist[27][0], xylist[27][1]))
-            if abs(float(calibration["hline"]) - float(nhline)) < deviation and abs(float(calibration["vline"]) - float(nvline)) < deviation:
+            if abs(float(calibration["hline"]) - float(nhline)) < face_size_deviation and abs(float(calibration["vline"]) - float(nvline)) < face_size_deviation:
                 L1 = line((xylist[2][0],xylist[2][1]),(xylist[14][0],xylist[14][1]))
                 L2 = line((xylist[8][0],xylist[8][1]),(xylist[27][0],xylist[27][1]))
                 R = intersection(L1, L2)
                 distList = []
                 index = 0
                 for (x, y) in xylist:
-                    # TODO: Potentially parse out all the not needed points
-                    distList.append(distance.euclidean((x,y),R) - normalize[index])
+                    if abs(distance.euclidean((x,y),R) - normalize[index]) <= face_landmark_deviation:
+                        distList.append(distance.euclidean((x,y),R) - normalize[index])
+                        
                     print("Unnormalize is " + str(distance.euclidean((x,y),R)) + " normalize is " 
                             + str(normalize[index]) + " resulting value is " 
                             + str(distance.euclidean((x,y),R) - normalize[index]))
@@ -130,17 +148,5 @@ def dataCollection(calibration):
 
 initCal = getInitialCal()
 data = dataCollection(initCal)
-fig = plt.figure()
-ax = fig.add_subplot(1, 1, 1, axisbg="1.0")
-for each in data:
-    distList = each[0]
-    index = 0
-    for distance in distList:
-        ax.scatter(distance, index, alpha=0.8, c="red", edgecolors='none', s=30)
-        index = index+1
-
-plt.title('Matplot scatter plot')
-plt.legend(loc=2)
-plt.show()
 
 print(data)
