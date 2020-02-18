@@ -123,16 +123,20 @@ def dataCollection(calibration):
                 R = intersection(L1, L2)
                 distList = []
                 index = 0
+                isToss = False
                 for (x, y) in xylist:
                     if abs(distance.euclidean((x,y),R) - normalize[index]) <= face_landmark_deviation:
-                        distList.append(distance.euclidean((x,y),R) - normalize[index])
-                        
+                        isToss = True
+
+                    distList.append(distance.euclidean((x,y),R) - normalize[index])    
                     print("Unnormalize is " + str(distance.euclidean((x,y),R)) + " normalize is " 
                             + str(normalize[index]) + " resulting value is " 
                             + str(distance.euclidean((x,y),R) - normalize[index]))
                     index = index + 1
+                    
+                if not isToss:
+                    data.append((distList, currTime))
                 
-                data.append((distList, currTime))
             else:
                 print("Failed deviation check")
             
