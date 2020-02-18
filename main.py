@@ -18,7 +18,7 @@ face_landmark_deviation = 55
 
 def graph(data):
     fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1, axisbg="1.0")
+    ax = fig.add_subplot(1, 1, 1)
     for each in data:
         distList = each[0]
         index = 0
@@ -26,7 +26,7 @@ def graph(data):
             ax.scatter(distance, index, alpha=0.8, c="red", edgecolors='none', s=30)
             index = index+1
 
-    plt.title('Matplot scatter plot')
+    plt.title('Facial landmarks scatter plot')
     plt.legend(loc=2)
     plt.show()
 
@@ -125,20 +125,20 @@ def dataCollection(calibration):
                 index = 0
                 isToss = False
                 for (x, y) in xylist:
-                    if abs(distance.euclidean((x,y),R) - normalize[index]) <= face_landmark_deviation:
+                    if abs(distance.euclidean((x,y),R) - normalize[index]) > face_landmark_deviation:
                         isToss = True
 
                     distList.append(distance.euclidean((x,y),R) - normalize[index])    
-                    print("Unnormalize is " + str(distance.euclidean((x,y),R)) + " normalize is " 
-                            + str(normalize[index]) + " resulting value is " 
-                            + str(distance.euclidean((x,y),R) - normalize[index]))
                     index = index + 1
-                    
+                
                 if not isToss:
+                    print("Data inserted!")
                     data.append((distList, currTime))
+                else:
+                    print("Failed landmark deviation check")
                 
             else:
-                print("Failed deviation check")
+                print("Failed face deviation check")
             
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 cv2.destroyAllWindows()
@@ -151,3 +151,4 @@ initCal = getInitialCal()
 data = dataCollection(initCal)
 
 print(data)
+graph(data)
