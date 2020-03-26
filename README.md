@@ -20,7 +20,7 @@ sudo pip install opencv-python-headless
 ````
 Start the script using the following:
 ````
-Python main.py
+python3 main.py
 ````
 
 ## Program Workflow
